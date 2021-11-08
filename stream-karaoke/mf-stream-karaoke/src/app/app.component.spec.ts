@@ -1,5 +1,7 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { PlayerService } from 'src/services/player.service';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
@@ -32,4 +34,27 @@ describe('AppComponent', () => {
     const compiled = fixture.nativeElement;
     expect(compiled.querySelector('.content span').textContent).toContain('mf-stream-karaoke app is running!');
   });
+
+  let component: AppComponent;
+  let service: PlayerService;
+  let router: Router;
+  let fixture: ComponentFixture<AppComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [AppComponent],
+      imports: [ RouterTestingModule ]
+
+    })
+    .compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
+    service = TestBed.inject(PlayerService);
+    router = TestBed.inject(Router);
+    fixture.detectChanges();
+  });
+
 });
