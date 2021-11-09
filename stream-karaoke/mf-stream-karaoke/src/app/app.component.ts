@@ -11,6 +11,7 @@ import { Cancion } from './clases/Cancion';
 export class AppComponent {
   title = 'mf-stream-karaoke';
 
+  public bubbles = [{"cssClass":"one"}];
   public isPlaying = false; //Let controls the loop when the song is playing
   public isAudioLoaded = false;
   public song: Cancion = new Cancion(); // the object that will contain the data of the song 
@@ -111,5 +112,9 @@ export class AppComponent {
   CloseWindow() {
     this.stopAudio();
     this.router.navigateByUrl("/Usuario");
+  }
+
+  generateBubble() {
+    this.bubbles.push({"cssClass":"two"});
   }
 }
