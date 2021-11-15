@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { PlayerService } from 'src/services/player.service';
 import { Cancion } from './clases/Cancion';
 
+import * as RecordRTC from 'recordrtc';
+
 @Component({
   selector: 'mf-stream-karaoke',
   templateUrl: './app.component.html',
@@ -11,7 +13,7 @@ import { Cancion } from './clases/Cancion';
 export class AppComponent {
   title = 'mf-stream-karaoke';
 
-  public bubbles = [{"cssClass":"one"}];
+  public bubbles = [{ "cssClass": "one" }];
   public isPlaying = false; //Let controls the loop when the song is playing
   public isAudioLoaded = false;
   public song: Cancion = new Cancion(); // the object that will contain the data of the song 
@@ -53,10 +55,11 @@ export class AppComponent {
   playAudio() {
     // the audio is stopped and loaded
     if (!this.isPlaying && this.isAudioLoaded) {
+      this.recording();
       this.audio.play();
       this.isPlaying = true;
       this.refresh(); // We run the karaoke function
-
+      
     } else {
       // the audio is playing so we pause the audio
       this.audio.pause();
@@ -115,6 +118,27 @@ export class AppComponent {
   }
 
   generateBubble() {
-    this.bubbles.push({"cssClass":"two"});
+    this.bubbles.push({ "cssClass": "two" });
   }
+
+  async recording() {
+    let stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+    let recorder = new RecordRTC.RecordRTCPromisesHandler(stream, {
+      mimeType: "audio/wav",
+      numberOfAudioChannels: 1,
+      sampleRate: 16000
+    });
+    recorder.startRecording();
+
+    const sleep = (m: number) => new Promise(r => setTimeout(r, m));
+    await sleep(3000);
+
+    await recorder.stopRecording();
+    let blob = await recorder.getBlob();
+    console.log(blob);
+    RecordRTC.invokeSaveAsDialog(blob);
+    return blob;
+  }
+
+
 }
