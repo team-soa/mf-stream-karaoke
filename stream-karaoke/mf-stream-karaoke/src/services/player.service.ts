@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Cancion } from 'src/app/clases/Cancion';
 
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -15,7 +14,7 @@ export class PlayerService {
     "artista": "Calvin Harris",
     "letra": [
       {
-        "second": 0,
+        "second": 1,
         "words": "When I met you in the summer"
       },
       {
@@ -38,7 +37,7 @@ export class PlayerService {
     _id: '',
     album: '',
     owner: '',
-    url: '',
+    url: '../assets/input1.wav',
     filename: ''
   }
 }

@@ -21,6 +21,7 @@ export class AppComponent {
   public nextLyrics = ""; // lyrics to sing after tha ones playing at the moment
   public currentSecs = 0.0; // let me know how many seconds have passed 
   audio = new Audio(); // audio object
+  timeDifference = 0;
 
   constructor(private router: Router, private player: PlayerService) { }
 
@@ -47,6 +48,8 @@ export class AppComponent {
     let lyrics = this.song.letra; // get the timed lyrics from the song object
     this.lyrics = lyrics[0].words; // set the first lyrics for starter screen
     this.nextLyrics = lyrics[1].words; // set the second lyrics to show
+
+    this.timeDifference = lyrics[1].second - lyrics[0].second;
   }
 
   /**
@@ -55,11 +58,10 @@ export class AppComponent {
   playAudio() {
     // the audio is stopped and loaded
     if (!this.isPlaying && this.isAudioLoaded) {
-      this.recording();
       this.audio.play();
       this.isPlaying = true;
       this.refresh(); // We run the karaoke function
-      
+
     } else {
       // the audio is playing so we pause the audio
       this.audio.pause();
@@ -90,13 +92,23 @@ export class AppComponent {
       if (self.isPlaying) {
         currentPos = parseFloat(currentPos.toFixed(2));
         self.currentSecs = currentPos;
-        lyrics.forEach(song => { // remember that lyrics composed of {second: number, words: string} objects
+        lyrics.forEach(song => { // remember that lyrics are composed of {second: number, words: string} objects
           // If we are at the second where some lyric should play
-          if (song.second == currentPos && currentPos > 1) {
+          if (song.second == currentPos && currentPos >= 1) {
+            this.recording(this.timeDifference * 1000);
+
             // update the lyrics
             this.lyrics = song.words;
-            let tmpIndex = lyrics.findIndex(tmpsong => (tmpsong.second == song.second))
-            this.nextLyrics = (lyrics[tmpIndex + 1]) ? lyrics[tmpIndex + 1].words : "";
+            let tmpIndex = lyrics.findIndex(tmpsong => (tmpsong.second == song.second));
+
+            if (lyrics[tmpIndex + 1]) {
+              this.nextLyrics = lyrics[tmpIndex + 1].words;
+              this.timeDifference = lyrics[tmpIndex + 1].second - song.second;
+            } else {
+              this.nextLyrics = "";
+              this.timeDifference = 5;
+            }
+
           }
         })
         currentPos += 0.01;
@@ -121,7 +133,7 @@ export class AppComponent {
     this.bubbles.push({ "cssClass": "two" });
   }
 
-  async recording() {
+  async recording(sleepTime: number) {
     let stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
     let recorder = new RecordRTC.RecordRTCPromisesHandler(stream, {
       mimeType: "audio/wav",
@@ -131,7 +143,7 @@ export class AppComponent {
     recorder.startRecording();
 
     const sleep = (m: number) => new Promise(r => setTimeout(r, m));
-    await sleep(3000);
+    await sleep(sleepTime);
 
     await recorder.stopRecording();
     let blob = await recorder.getBlob();
