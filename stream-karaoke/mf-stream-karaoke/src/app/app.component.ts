@@ -4,6 +4,9 @@ import { PlayerService } from 'src/services/player.service';
 import { Cancion } from './clases/Cancion';
 
 import * as RecordRTC from 'recordrtc';
+import { fromEvent } from 'rxjs';
+import { CookieService } from 'ngx-cookie-service';
+import { hostViewClassName } from '@angular/compiler';
 
 @Component({
   selector: 'mf-stream-karaoke',
@@ -22,13 +25,16 @@ export class AppComponent {
   public currentSecs = 0.0; // let me know how many seconds have passed 
   audio = new Audio(); // audio object
   timeDifference = 0;
+  public score = 0;
 
-  constructor(private router: Router, private player: PlayerService) { }
+  constructor(private router: Router, private player: PlayerService, private cookie: CookieService) { }
 
-  ngOnInit() {
-    this.song = this.player.cancion; // we get the song object from the PlayerService
+  async ngOnInit() {
+    
+    // this.song = this.player.cancion; // we get the song object from the PlayerService
+    await this.validating();
+    console.log(this.song)
     this.loadAudio(); // Loads the audio and lyrics
-
   }
 
   /**
@@ -92,11 +98,13 @@ export class AppComponent {
       if (self.isPlaying) {
         currentPos = parseFloat(currentPos.toFixed(2));
         self.currentSecs = currentPos;
-        lyrics.forEach(song => { // remember that lyrics are composed of {second: number, words: string} objects
+        lyrics.forEach(async song => { // remember that lyrics are composed of {second: number, words: string} objects
           // If we are at the second where some lyric should play
           if (song.second == currentPos && currentPos >= 1) {
-            this.recording(this.timeDifference * 1000);
-
+            let blob = await this.recording(this.timeDifference * 1000);
+            let tmpscore = await this.player.sendAudio(blob, this.lyrics, "en").toPromise();
+            console.log("años de Brayan", tmpscore)
+            this.score = this.score + tmpscore;
             // update the lyrics
             this.lyrics = song.words;
             let tmpIndex = lyrics.findIndex(tmpsong => (tmpsong.second == song.second));
@@ -133,12 +141,33 @@ export class AppComponent {
     this.bubbles.push({ "cssClass": "two" });
   }
 
+  newSearch$ = fromEvent(window, "newStream");
+
+  async validating() {
+    console.log(this.cookie.get("streamCancion"))
+    let idSong = this.cookie.get("streamCancion");
+    this.song = await this.player.getSong(idSong).toPromise();
+    // this.player.getSong(idSong).subscribe(song => {
+    //   console.log("Brayan, felicidades", song)
+    //   this.song = song;
+    // });
+
+
+  }
+
   async recording(sleepTime: number) {
     let stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+    let options: RecordRTC.Options = {
+      
+    }
     let recorder = new RecordRTC.RecordRTCPromisesHandler(stream, {
-      mimeType: "audio/wav",
+      mimeType: "audio/webm;codecs=pcm",
       numberOfAudioChannels: 1,
-      sampleRate: 16000
+      sampleRate:23000,
+      desiredSampRate: 23000,
+      bufferSize: 8192,
+      bitsPerSecond: 32000
+
     });
     recorder.startRecording();
 
@@ -147,9 +176,8 @@ export class AppComponent {
 
     await recorder.stopRecording();
     let blob = await recorder.getBlob();
-    console.log(blob);
-    RecordRTC.invokeSaveAsDialog(blob);
-    return blob;
+    RecordRTC.invokeSaveAsDialog(blob);    
+    return  blob;
   }
 
 

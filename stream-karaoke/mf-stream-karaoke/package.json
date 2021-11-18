@@ -21,6 +21,7 @@
     "@angular/platform-browser": "~11.2.6",
     "@angular/platform-browser-dynamic": "~11.2.6",
     "@angular/router": "~11.2.6",
+    "ngx-cookie-service": "^12.0.0",
     "recordrtc": "^5.6.2",
     "rxjs": "~6.6.0",
     "single-spa": ">=4.0.0",

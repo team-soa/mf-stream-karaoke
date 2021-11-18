@@ -5,6 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { EmptyRouteComponent } from './empty-route/empty-route.component';
+import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { EmptyRouteComponent } from './empty-route/empty-route.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    CommonModule 
+    CommonModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
