@@ -1,7 +1,11 @@
 @import url("../styles.scss");
 
 .fondo{
-  height: 80vh;
+  position: absolute;
+  margin-top: 10vh;
+  right: 0;
+  left: 0;
+  height: 90vh;
 }
 h2 {
     margin-top: 5vh;
