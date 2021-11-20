@@ -134,7 +134,7 @@ export class AppComponent {
 
   CloseWindow() {
     this.stopAudio();
-    this.router.navigateByUrl("/Usuario");
+    this.router.navigateByUrl("/VistaPrincipal");
   }
 
   generateBubble() {
