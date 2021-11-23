@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  mfstreamkaraoke:
+    image: mfstreamkaraoke
+    build:
+      context: stream-karaoke/mf-stream-karaoke
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: development
+    ports:
+      - 4212:4212
+      - 9229:9229
+    command: ["node", "--inspect=0.0.0.0:9229", "index.js"]
