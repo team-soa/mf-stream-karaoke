@@ -1,10 +1,23 @@
-FROM node:lts-alpine
-ENV NODE_ENV=production
-WORKDIR /usr/src/app
-COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
-RUN npm install --production --silent && mv node_modules ../
-COPY . .
-EXPOSE 4212
-RUN chown -R node /usr/src/app
-USER node
-CMD ["npm", "start"]
+FROM node:16.10-alpine as build-step
+
+# Create new directory to work on
+RUN mkdir -p /build
+
+WORKDIR /build
+
+COPY package.json /build
+COPY package-lock.json /build
+
+# Run init commands
+RUN npm ci
+
+COPY . /build
+
+RUN npm run build
+
+# Execute build on nginx servevr
+FROM nginx:1.17.1-alpine
+
+COPY nginx.conf /etc/nginx/nginx.conf
+
+COPY --from=build-step /build/dist/mf-stream-karaoke /usr/share/nginx/html
