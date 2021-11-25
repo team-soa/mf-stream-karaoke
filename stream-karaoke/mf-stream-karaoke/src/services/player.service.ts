@@ -54,7 +54,7 @@ export class PlayerService {
 
   public sendAudio(blob: Blob, lyrics: string, language: string):Observable<number> {
     // return this.http.post(this.URL );
-    let URL = 'https://localhost:5001/api/Speech';
+    let URL = 'http://localhost:5000/api/Speech';
     const formData = new FormData();
     formData.set("soundFile", blob);
     return this.http.post<number>(URL, formData, {params: { language: language, phrase: lyrics },headers: new HttpHeaders().set('Authorization', 'bearer ' + this.cookieService.get("token"))});

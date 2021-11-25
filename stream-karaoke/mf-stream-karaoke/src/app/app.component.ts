@@ -7,6 +7,8 @@ import * as RecordRTC from 'recordrtc';
 import { fromEvent } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { hostViewClassName } from '@angular/compiler';
+// @ts-ignore
+import audioBufferToWav from './audioBufferToWav';
 
 @Component({
   selector: 'mf-stream-karaoke',
@@ -155,7 +157,10 @@ export class AppComponent {
 
   }
 
-  async recording(sleepTime: number) {
+  async recording(sleepTime: number): Promise<Blob> {
+    // @ts-ignore
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
     let stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
     let options: RecordRTC.Options = {
       
@@ -176,9 +181,35 @@ export class AppComponent {
 
     await recorder.stopRecording();
     let blob = await recorder.getBlob();
-    RecordRTC.invokeSaveAsDialog(blob);    
-    return  blob;
+
+
+    return new Promise((resolve, reject) => {
+
+      var arrayBuffer;
+      var fileReader = new FileReader();
+      fileReader.onload = function(event) {
+          arrayBuffer = event.target!.result;
+      };
+      var a = document.createElement("a");
+      document.body.appendChild(a);
+
+      fileReader.readAsArrayBuffer(blob);
+      fileReader.onloadend=function(d){
+        // @ts-ignore
+          audioCtx.decodeAudioData(fileReader.result,
+              function(buffer) {
+                  var wavBuffer:ArrayBuffer = audioBufferToWav(buffer);
+                  let wavBlob = new Blob([wavBuffer]);
+                  let url = window.URL.createObjectURL(wavBlob);
+                  a.href = url;
+                  a.download = 'archivowav.wav';
+                  a.click();
+                  window.URL.revokeObjectURL(url);    
+                  resolve(wavBlob);
+              },
+              function(e){ console.log( e); }
+          );
+      };
+    });
   }
-
-
 }
