@@ -1,5 +1,13 @@
 @import url("../styles.scss");
 
+.fondoAux{
+  position: absolute;
+  top: 0 px;
+  right: 0px;
+  left: 0px;
+  background: #12001D;
+}
+
 .fondo{
   position: absolute;
   margin-top: 10vh;

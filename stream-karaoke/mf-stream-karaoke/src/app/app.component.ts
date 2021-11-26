@@ -138,7 +138,7 @@ export class AppComponent {
 
   CloseWindow() {
     this.stopAudio();
-    this.router.navigateByUrl("/VistaPrincipal");
+    this.router.navigate(['/VistaPrincipal']);
   }
 
   generateBubble() {
@@ -166,52 +166,52 @@ export class AppComponent {
     let stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
     let options: RecordRTC.Options = {
       
-    // }
-    // let recorder = new RecordRTC.RecordRTCPromisesHandler(stream, {
-    //   mimeType: "audio/webm;codecs=pcm",
-    //   numberOfAudioChannels: 1,
-    //   sampleRate:23000,
-    //   desiredSampRate: 23000,
-    //   bufferSize: 8192,
-    //   bitsPerSecond: 32000
+      }
+      let recorder = new RecordRTC.RecordRTCPromisesHandler(stream, {
+        mimeType: "audio/webm;codecs=pcm",
+        numberOfAudioChannels: 1,
+        sampleRate:23000,
+        desiredSampRate: 23000,
+        bufferSize: 8192,
+        bitsPerSecond: 32000
 
-    // });
-    // recorder.startRecording();
+      });
+      recorder.startRecording();
 
-    // const sleep = (m: number) => new Promise(r => setTimeout(r, m));
-    // await sleep(sleepTime);
+      const sleep = (m: number) => new Promise(r => setTimeout(r, m));
+      await sleep(sleepTime);
 
-    await recorder.stopRecording();
-    let blob = await recorder.getBlob();
+      await recorder.stopRecording();
+      let blob = await recorder.getBlob();
 
 
-    return new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
 
-      var arrayBuffer;
-      var fileReader = new FileReader();
-      fileReader.onload = function(event) {
+        var arrayBuffer;
+        var fileReader = new FileReader();
+        fileReader.onload = function (event) {
           arrayBuffer = event.target!.result;
-      };
-      var a = document.createElement("a");
-      document.body.appendChild(a);
+        };
+        var a = document.createElement("a");
+        document.body.appendChild(a);
 
-      fileReader.readAsArrayBuffer(blob);
-      fileReader.onloadend=function(d){
-        // @ts-ignore
+        fileReader.readAsArrayBuffer(blob);
+        fileReader.onloadend = function (d) {
+          // @ts-ignore
           audioCtx.decodeAudioData(fileReader.result,
-              function(buffer) {
-                  var wavBuffer:ArrayBuffer = audioBufferToWav(buffer);
-                  let wavBlob = new Blob([wavBuffer]);
-                  let url = window.URL.createObjectURL(wavBlob);
-                  a.href = url;
-                  a.download = 'archivowav.wav';
-                  a.click();
-                  window.URL.revokeObjectURL(url);    
-                  resolve(wavBlob);
-              },
-              function(e){ console.log( e); }
+            function (buffer) {
+              var wavBuffer: ArrayBuffer = audioBufferToWav(buffer);
+              let wavBlob = new Blob([wavBuffer]);
+              let url = window.URL.createObjectURL(wavBlob);
+              a.href = url;
+              a.download = 'archivowav.wav';
+              a.click();
+              window.URL.revokeObjectURL(url);
+              resolve(wavBlob);
+            },
+            function (e) { console.log(e); }
           );
-      };
-    });
+        };
+      });
+    }
   }
-}
