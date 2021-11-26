@@ -33,7 +33,6 @@ export class AppComponent {
   constructor(private router: Router, private player: PlayerService, private cookie: CookieService) { }
 
   async ngOnInit() {
-    this.recording(4);
 
     // this.song = this.player.cancion; // we get the song object from the PlayerService
     await this.validating();
@@ -105,10 +104,8 @@ export class AppComponent {
         lyrics.forEach(async song => { // remember that lyrics are composed of {second: number, words: string} objects
           // If we are at the second where some lyric should play
           if (song.second == currentPos && currentPos >= 1) {
-            let blob = await this.recording(this.timeDifference * 1000);
-            // let tmpscore = await this.player.sendAudio(blob, this.lyrics, "en").toPromise();
-            // console.log("años de Brayan", tmpscore)
-            // this.score = this.score + tmpscore;
+            let blob =  this.recording(this.timeDifference * 1000);
+
             // update the lyrics
             this.lyrics = song.words;
             let tmpIndex = lyrics.findIndex(tmpsong => (tmpsong.second == song.second));
@@ -147,6 +144,7 @@ export class AppComponent {
 
   newSearch$ = fromEvent(window, "newStream");
 
+
   async validating() {
     console.log(this.cookie.get("streamCancion"))
     let idSong = this.cookie.get("streamCancion");
@@ -165,7 +163,7 @@ export class AppComponent {
 
     let stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
     let options: RecordRTC.Options = {
-      
+
       }
       let recorder = new RecordRTC.RecordRTCPromisesHandler(stream, {
         mimeType: "audio/webm;codecs=pcm",
@@ -196,17 +194,17 @@ export class AppComponent {
         document.body.appendChild(a);
 
         fileReader.readAsArrayBuffer(blob);
+        let tmp = this;
+
         fileReader.onloadend = function (d) {
           // @ts-ignore
           audioCtx.decodeAudioData(fileReader.result,
-            function (buffer) {
+            async function (buffer) {
               var wavBuffer: ArrayBuffer = audioBufferToWav(buffer);
               let wavBlob = new Blob([wavBuffer]);
-              let url = window.URL.createObjectURL(wavBlob);
-              a.href = url;
-              a.download = 'archivowav.wav';
-              a.click();
-              window.URL.revokeObjectURL(url);
+              let tmpscore = await tmp.player.sendAudio(wavBlob, tmp.lyrics, "en").toPromise();
+              console.log("años de Brayan", tmpscore)
+              tmp.score = tmp.score + tmpscore;
               resolve(wavBlob);
             },
             function (e) { console.log(e); }
