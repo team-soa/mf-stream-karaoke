@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerService } from 'src/services/player.service';
 import { Cancion } from './clases/Cancion';
+import * as Recorder from 'recorder-js';
 
 import * as RecordRTC from 'recordrtc';
 import { fromEvent } from 'rxjs';
@@ -32,7 +33,8 @@ export class AppComponent {
   constructor(private router: Router, private player: PlayerService, private cookie: CookieService) { }
 
   async ngOnInit() {
-    
+    this.recording(4);
+
     // this.song = this.player.cancion; // we get the song object from the PlayerService
     await this.validating();
     console.log(this.song)
@@ -104,9 +106,9 @@ export class AppComponent {
           // If we are at the second where some lyric should play
           if (song.second == currentPos && currentPos >= 1) {
             let blob = await this.recording(this.timeDifference * 1000);
-            let tmpscore = await this.player.sendAudio(blob, this.lyrics, "en").toPromise();
-            console.log("años de Brayan", tmpscore)
-            this.score = this.score + tmpscore;
+            // let tmpscore = await this.player.sendAudio(blob, this.lyrics, "en").toPromise();
+            // console.log("años de Brayan", tmpscore)
+            // this.score = this.score + tmpscore;
             // update the lyrics
             this.lyrics = song.words;
             let tmpIndex = lyrics.findIndex(tmpsong => (tmpsong.second == song.second));
@@ -164,20 +166,20 @@ export class AppComponent {
     let stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
     let options: RecordRTC.Options = {
       
-    }
-    let recorder = new RecordRTC.RecordRTCPromisesHandler(stream, {
-      mimeType: "audio/webm;codecs=pcm",
-      numberOfAudioChannels: 1,
-      sampleRate:23000,
-      desiredSampRate: 23000,
-      bufferSize: 8192,
-      bitsPerSecond: 32000
+    // }
+    // let recorder = new RecordRTC.RecordRTCPromisesHandler(stream, {
+    //   mimeType: "audio/webm;codecs=pcm",
+    //   numberOfAudioChannels: 1,
+    //   sampleRate:23000,
+    //   desiredSampRate: 23000,
+    //   bufferSize: 8192,
+    //   bitsPerSecond: 32000
 
-    });
-    recorder.startRecording();
+    // });
+    // recorder.startRecording();
 
-    const sleep = (m: number) => new Promise(r => setTimeout(r, m));
-    await sleep(sleepTime);
+    // const sleep = (m: number) => new Promise(r => setTimeout(r, m));
+    // await sleep(sleepTime);
 
     await recorder.stopRecording();
     let blob = await recorder.getBlob();
