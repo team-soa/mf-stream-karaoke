@@ -38,6 +38,13 @@ export class AppComponent {
     await this.validating();
     console.log(this.song)
     this.loadAudio(); // Loads the audio and lyrics
+
+    this.player.postArtist(this.song).subscribe(resp => {
+      console.log('hola',this.song, resp)
+    })
+    // await this.player.postArtist(this.song).toPromise();
+    await this.player.postSong(this.song).toPromise();
+
   }
 
   /**
@@ -65,6 +72,7 @@ export class AppComponent {
    * Lets play and pause the audio
    */
   playAudio() {
+
     // the audio is stopped and loaded
     if (!this.isPlaying && this.isAudioLoaded) {
       this.audio.play();

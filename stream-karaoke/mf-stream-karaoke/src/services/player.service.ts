@@ -60,4 +60,17 @@ export class PlayerService {
     return this.http.post<number>(URL, formData, {params: { language: language, phrase: lyrics },headers: new HttpHeaders().set('Authorization', 'bearer ' + this.cookieService.get("token"))});
 
   }
+
+  public postArtist(cancion: Cancion): Observable<Object>{
+    let URL = 'http://20.114.84.8:4005/artistas/update/';
+    return this.http.post(URL + cancion.artista ,{headers: new HttpHeaders().set('Authorization', 'bearer ' + this.cookieService.get("token"))});
+  }
+
+  public postSong(cancion: Cancion): Observable<Object>{
+    let URL = 'http://20.114.84.8:4005/canciones/update/';
+    return this.http.post(URL + cancion.nombre ,{headers: new HttpHeaders().set('Authorization', 'bearer ' + this.cookieService.get("token"))});
+  }
+
+
+
 }
