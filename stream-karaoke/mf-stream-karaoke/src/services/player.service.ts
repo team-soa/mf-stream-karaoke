@@ -9,7 +9,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   providedIn: 'root'
 })
 export class PlayerService {
-  URL = 'http://20.114.82.7:4003/songs'
+  URL = 'http://20.114.105.27:4003/songs'
 
   constructor(private cookieService: CookieService, private http: HttpClient){}
 
