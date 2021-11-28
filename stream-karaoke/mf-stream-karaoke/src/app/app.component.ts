@@ -210,6 +210,13 @@ export class AppComponent {
             async function (buffer) {
               var wavBuffer: ArrayBuffer = audioBufferToWav(buffer);
               let wavBlob = new Blob([wavBuffer]);
+              let idioma="en";
+              if (tmp.song.idioma!=undefined && tmp.song.idioma=="es")
+              {
+                
+                idioma="es";
+              }
+              console.log(idioma)
               let tmpscore = await tmp.player.sendAudio(wavBlob, tmp.lyrics, "en").toPromise();
               console.log("años de Brayan", tmpscore)
               tmp.score = tmp.score + tmpscore;

@@ -8,4 +8,5 @@ export class Cancion{
   owner: string = '';
   url: string = '';
   filename: string = '';
+  idioma: string = '';
 }
